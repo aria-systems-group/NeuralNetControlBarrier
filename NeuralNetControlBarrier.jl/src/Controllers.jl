@@ -1,8 +1,6 @@
 # Control hypercube optimization 
 function controller_convex(system_flag, x_star, system_dimension, identifier, controller_dimension, partitions, M_h_ii, M_l_ii, B_h_ii, B_l_ii)
 
-    # Optimize code later: only include controlled dimensions 
-
     # Initialize solver
     lp_control_model = Model()
     set_optimizer(lp_control_model, GLPK.Optimizer)
