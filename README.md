@@ -4,11 +4,13 @@ Neural Networks (NNs) have been successfully employed to represent the state evo
 
 ## Purpose of this code
 This code generates stochastic barrier functions and controllers for NNDMs, in accordance with the paper. \
-Three case studies are included: 
+Five case studies are included: 
 
 1. **Pendulum 2D**
 2. **Cartpole 4D** 
 3. **Husky 4D**
+4. **Husky 5D**
+5. **Acrobot 6D**
 
 ## Repeat Experiments
 | **`Linux`** | **`Mac OS X`** | **`Windows`** |
