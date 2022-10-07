@@ -69,7 +69,7 @@ The same command can be run for the Cartpole and Husky by changing the system's 
 
 ## Change experiment setup for each case study
 Navigate to the *src* folder inside NeuralNetControlBarrier.jl and open *Systems.jl*.  \
-For each system, change the number of hypercubes by adjusting `number_hypercubes` on line 16, 21 or 26. \
+For each system, change the number of hypercubes by adjusting `number_hypercubes`.
 Table 1 in the paper includes the possible number of hypercubes for each system. 
 
 ## Contributing
