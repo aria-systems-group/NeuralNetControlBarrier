@@ -18,14 +18,30 @@ function inputs(system_flag::String)::Tuple
        initial_set_radius = deg2rad(5.0)
        decision_eta_flag = true
 
+    # Cartpole
     elseif system_flag ==  "cartpole"
         number_hypercubes = 960
         layer_flag = "1"
         initial_set_radius = deg2rad(5.0)
         decision_eta_flag = true
 
-    elseif system_flag == "husky"
+    # Husky 4D
+    elseif system_flag == "husky4d"
         number_hypercubes = 900
+        layer_flag = "1"
+        initial_set_radius = 0.1
+        decision_eta_flag = false
+
+    # Husky 5D
+    elseif system_flag == "husky5d"
+        number_hypercubes = 432
+        layer_flag = "1"
+        initial_set_radius = 0.1
+        decision_eta_flag = false
+
+    # Acrobot
+    elseif system_flag == "acrobot"
+        number_hypercubes = 144
         layer_flag = "1"
         initial_set_radius = 0.1
         decision_eta_flag = false

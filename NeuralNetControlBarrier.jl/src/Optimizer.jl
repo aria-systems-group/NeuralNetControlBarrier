@@ -101,8 +101,12 @@ function optimization(input_data::Tuple)
     # One initial condition and unsafe conditions
     if system_flag == "cartpole" && large_range_initial == true 
         number_decision_vars = ((system_dimension)^2 + 1 + 1)*length(barrier_monomial)
-    elseif system_flag == "husky" && large_range_initial == true 
+    elseif system_flag == "husky4d" && large_range_initial == true 
         number_decision_vars = ((system_dimension)^2 + 1 + 1 + 1)*length(barrier_monomial)
+    elseif system_flag == "husky5d" && large_range_initial == true 
+        number_decision_vars = ((system_dimension)^2 + 1 + 1 + 1)*length(barrier_monomial)
+    elseif system_flag == "acrobot" && large_range_initial == true 
+        number_decision_vars = ((system_dimension)^2 + 1 + 1 + 1 + 1)*length(barrier_monomial)
     elseif system_flag == "pendulum" && large_range_initial == true 
         number_decision_vars = ((system_dimension)^2 + 1 + 1)*length(barrier_monomial)
     end
@@ -126,12 +130,15 @@ function optimization(input_data::Tuple)
             if system_flag == "cartpole" && large_range_initial == true 
                 lag_poly_theta::DynamicPolynomials.Polynomial{true, AffExpr} =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag+1)::Int64, lagrange_degree::Int64)
                 add_constraint_to_model(model, lag_poly_theta)
-            elseif system_flag == "pendulum" && large_range_initial == true
+            elseif (system_flag == "pendulum" && large_range_initial == true) || (system_flag == "pendulum3d" && large_range_initial == true )
                 lag_poly_theta_pen::DynamicPolynomials.Polynomial{true, AffExpr} =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag+1)::Int64, lagrange_degree::Int64)
                 add_constraint_to_model(model, lag_poly_theta_pen)
-            elseif  system_flag == "husky" && large_range_initial == true
-                lag_poly_x1::DynamicPolynomials.Polynomial{true, AffExpr} =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag+1)::Int64, lagrange_degree::Int64)
-                lag_poly_x2::DynamicPolynomials.Polynomial{true, AffExpr} =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag+2)::Int64, lagrange_degree::Int64)
+            elseif  (system_flag == "husky4d" || system_flag == "husky5d") && large_range_initial == true
+                lag_poly_x1 =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag+1)::Int64, lagrange_degree::Int64)
+                lag_poly_x2 =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag+2)::Int64, lagrange_degree::Int64)
+            elseif  (system_flag == "acrobot") && large_range_initial == true
+                lag_poly_x1 =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag+1)::Int64, lagrange_degree::Int64)
+                lag_poly_x2 =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag+2)::Int64, lagrange_degree::Int64)
             end
 
             # Initial condition radius and ball
@@ -162,9 +169,23 @@ function optimization(input_data::Tuple)
                     end
                 end
 
-            elseif system_flag == "husky" && large_range_initial == true 
-                x1_initial_radius = initial_set_radius^2
-                x2_initial_radius = initial_set_radius^2
+            elseif (system_flag == "husky4d" || system_flag == "husky5d") && large_range_initial == true 
+                x1_initial_radius = 0.1^2
+                x2_initial_radius = 0.1^2
+
+                for jj = 1:length(x)
+                    if jj == 1
+                        x1_initial_radius += -(x[jj] - x_init[jj])^2
+                    elseif jj == 2
+                        x2_initial_radius += -(x[jj] - x_init[jj])^2    
+                    else 
+                        x_initial_sums += -(x[jj] - x_init[jj])^2
+                    end
+                end
+                
+            elseif (system_flag == "acrobot") && large_range_initial == true 
+                x1_initial_radius = 0.1^2
+                x2_initial_radius = 0.1^2
 
                 for jj = 1:length(x)
                     if jj == 1
@@ -185,12 +206,12 @@ function optimization(input_data::Tuple)
             # Barrier constraint eta
             if system_flag == "cartpole" && large_range_initial == true
                 _barrier_initial = - BARRIER + eta - lag_poly_i * x_initial_sums - lag_poly_theta*theta_initial_sums
-            elseif (system_flag == "husky" || system_flag == "husky5d") && large_range_initial == true 
+            elseif (system_flag == "husky4d" || system_flag == "husky5d") && large_range_initial == true 
+                _barrier_initial = - BARRIER + eta - lag_poly_i * x_initial_sums - lag_poly_x1*x1_initial_radius - lag_poly_x2*x2_initial_radius
+            elseif (system_flag == "acrobot") && large_range_initial == true 
                 _barrier_initial = - BARRIER + eta - lag_poly_i * x_initial_sums - lag_poly_x1*x1_initial_radius - lag_poly_x2*x2_initial_radius
             elseif system_flag == "pendulum" && large_range_initial == true
                 _barrier_initial = - BARRIER + eta - lag_poly_i * x_initial_sums - lag_poly_theta_pen*theta_initial_sums
-            else
-                _barrier_initial = - BARRIER + eta - lag_poly_i * x_initial_sums
             end
 
             # Add constraint to model
@@ -222,7 +243,7 @@ function optimization(input_data::Tuple)
             end
 
         # Barrier unsafe region conditions (husky)
-        elseif system_flag == "husky" 
+        elseif (system_flag == "husky4d" || system_flag == "husky5d")
 
             if ii == 1 || ii == 2
 
@@ -252,8 +273,38 @@ function optimization(input_data::Tuple)
 
             end
 
+        # Barrier unsafe region conditions (acrobot)
+        elseif (system_flag == "acrobot")
 
-        # Barrier unsafe region conditions (twodim)
+            if ii == 2 || ii == 4
+
+                # Generate sos polynomials
+                if large_range_initial == true 
+                    count_lag = 2*ii + 1
+                else
+                    count_lag = 2*ii
+                end
+
+                lag_poly_i_lower =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag - 1)::Int64, lagrange_degree::Int64)
+                lag_poly_i_upper =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag)::Int64, lagrange_degree::Int64)
+
+                # State space ranges
+                x_i_lower = -0.6
+                x_i_upper = 0.6
+
+                # Specify constraints for initial and unsafe set
+                _barrier_unsafe_lower = BARRIER - lag_poly_i_lower * (x_i_lower - x[ii]) - 1
+                _barrier_unsafe_upper = BARRIER - lag_poly_i_upper * (x[ii] - x_i_upper) - 1
+
+                # Add constraints to model
+                add_constraint_to_model(model, lag_poly_i_lower)
+                add_constraint_to_model(model, lag_poly_i_upper)
+                add_constraint_to_model(model, _barrier_unsafe_lower)
+                add_constraint_to_model(model, _barrier_unsafe_upper)
+
+            end
+
+        # Barrier unsafe region conditions (pendulum)
         elseif system_flag == "pendulum" 
     
             if ii == 1
@@ -626,8 +677,12 @@ function control_loop(input_data::Tuple, certificate, eta_certificate, x_star, m
         # Call on feedback law
         if system_flag == "cartpole"
             control_dimensions = [0, 1, 0, 1]
-        elseif system_flag == "husky"
+        elseif system_flag == "husky4d"
             control_dimensions = [0, 0, 1, 1]
+        elseif system_flag == "husky5d"
+            control_dimensions = [0, 0, 0, 1, 1]
+        elseif system_flag == "acrobot"
+            control_dimensions = [0, 0, 0, 0, 1, 1]
         elseif system_flag == "pendulum"
             control_dimensions = [0 ,1]
         else

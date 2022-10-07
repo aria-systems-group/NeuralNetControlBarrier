@@ -1,6 +1,6 @@
 # NeuralNetControlBarrier
 
-Neural Networks (NNs) have been successfully employed to represent the state evolution of complex dynamical systems. Such models, referred to as NN dynamic models (NNDMs), use iterative noisy predictions of NN to estimate a distribution of system trajectories over time. Despite their accuracy, safety analysis of NNDMs is known to be a challenging problem and remains largely unexplored. To address this issue, in this paper, we introduce a method of providing safety guarantees for NNDMs. The paper, titled: "Safety Guarantees for Neural Network Dynamic Systems via Stochastic Barrier Functions", can be found on [ArXiv](https://arxiv.org/abs/2206.07811).
+Neural Networks (NNs) have been successfully employed to represent the state evolution of complex dynamical systems. Such models, referred to as NN dynamic models (NNDMs), use iterative noisy predictions of NN to estimate a distribution of system trajectories over time. Despite their accuracy, safety analysis of NNDMs is known to be a challenging problem and remains largely unexplored. To address this issue, in this paper, we introduce a method of providing safety guarantees for NNDMs. The paper (Neurips 2022), titled: "Safety Guarantees for Neural Network Dynamic Systems via Stochastic Barrier Functions", can be found on [ArXiv](https://arxiv.org/abs/2206.07811).
 
 ## Purpose of this code
 This code generates stochastic barrier functions and controllers for NNDMs, in accordance with the paper. \
@@ -43,7 +43,9 @@ Use the following commands to run the optimization case studies through bash.
 ```sh
 runOptimization pendulum   # To run Pendulum
 runOptimization cartpole   # To run Cartpole
-runOptimization husky      # To run Husky
+runOptimization husky4d    # To run Husky 4D
+runOptimization husky5d    # To run Husky 5D
+runOptimization acrobot    # To run Acrobot
 
 ```
 

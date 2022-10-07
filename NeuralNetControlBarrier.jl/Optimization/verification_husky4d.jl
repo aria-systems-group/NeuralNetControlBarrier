@@ -8,7 +8,7 @@ using NeuralNetControlBarrier
 using Optim
 
 # System definition
-system_flag =  "husky"
+system_flag =  "husky4d"
 input_data = inputs(system_flag)
 
 # Optimize certificate
