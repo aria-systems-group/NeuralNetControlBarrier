@@ -162,7 +162,7 @@ function optimization(input_data::Tuple)
                 theta_initial_sums = x_initial_radius
 
                 for jj = 1:length(x)
-                    if jj != 3
+                    if jj != 1
                         x_initial_sums += -(x[jj] - x_init[jj])^2
                     else 
                         theta_initial_sums += -(x[jj] - x_init[jj])^2
