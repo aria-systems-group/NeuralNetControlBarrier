@@ -545,6 +545,7 @@ function control_loop(input_data::Tuple, certificate, eta_certificate, x_star, m
     layer_flag = input_data[7]
     beta_partition = input_data[8]
     print_to_txt = input_data[11]
+    standard_deviation = input_data[13]
 
     # File reading
     filename = "/models/" * system_flag * "/" * neural_network_bound  * "/" * layer_flag* "_layers/partition_data_"  * string(number_hypercubes) * ".mat"
@@ -599,9 +600,6 @@ function control_loop(input_data::Tuple, certificate, eta_certificate, x_star, m
     # Create barrier polynomial, specify degree Lagrangian polynomials
     alpha::Float64 = 1
     lagrange_degree::Int64 = 2
-
-    # Specify noise element (Gaussian)
-    standard_deviation::Float64 = 0.1
 
     # Barrier
     BARRIER = certificate
