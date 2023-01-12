@@ -1,4 +1,5 @@
 # Dynamical Neural Network Verification using Control Barrier Functions
+using Revise
 
 # Initialization Statement
 print("\n Computing Control Barrier Certificate & Controller based on Neural Network Bounds ")

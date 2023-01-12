@@ -4,7 +4,7 @@ module NeuralNetControlBarrier
 
 # Import packages
 using SumOfSquares
-using DynamicPolynomials
+using MultivariatePolynomials, DynamicPolynomials
 using MosekTools
 using MAT 
 using Polynomials
