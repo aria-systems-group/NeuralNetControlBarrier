@@ -17,6 +17,7 @@ function inputs(system_flag::String)::Tuple
        layer_flag = "1"
        initial_set_radius = deg2rad(5.0)
        decision_eta_flag = true
+       standard_deviation = [0.01, 0.01]
 
     # Cartpole
     elseif system_flag ==  "cartpole"
@@ -24,6 +25,7 @@ function inputs(system_flag::String)::Tuple
         layer_flag = "1"
         initial_set_radius = deg2rad(5.0)
         decision_eta_flag = true
+        standard_deviation = [0.01, 0.01, 0.01, 0.01]
 
     # Husky 4D
     elseif system_flag == "husky4d"
@@ -31,6 +33,7 @@ function inputs(system_flag::String)::Tuple
         layer_flag = "1"
         initial_set_radius = 0.1
         decision_eta_flag = false
+        standard_deviation = [0.01, 0.01, 0.01, 0.01]
 
     # Husky 5D
     elseif system_flag == "husky5d"
@@ -38,6 +41,7 @@ function inputs(system_flag::String)::Tuple
         layer_flag = "1"
         initial_set_radius = 0.1
         decision_eta_flag = false
+        standard_deviation = [0.01, 0.01, 0.01, 0.01, 0.01]
 
     # Acrobot
     elseif system_flag == "acrobot"
@@ -45,6 +49,7 @@ function inputs(system_flag::String)::Tuple
         layer_flag = "1"
         initial_set_radius = 0.1
         decision_eta_flag = false
+        standard_deviation = [0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
 
     else
         print("System not defined ...")
@@ -63,7 +68,8 @@ function inputs(system_flag::String)::Tuple
             large_range_initial,
             initial_set_radius,
             print_to_txt,
-            decision_eta_flag
+            decision_eta_flag,
+            standard_deviation
 
 end
 

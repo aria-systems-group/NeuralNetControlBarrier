@@ -14,6 +14,7 @@ function optimization(input_data::Tuple)
     initial_set_radius = input_data[10]
     print_to_txt = input_data[11]
     decision_eta_flag = input_data[12]
+    standard_deviation = input_data[13]
 
     # File reading
     filename = "/models/" * system_flag * "/" * neural_network_bound  * "/" * layer_flag* "_layers/partition_data_"  * string(number_hypercubes) * ".mat"
@@ -48,7 +49,7 @@ function optimization(input_data::Tuple)
     @polyvar x[1:system_dimension]
 
     # Create noise variable
-    @polyvar z
+    @polyvar z[1:system_dimension]
 
     # Create CROWN bounds variables
     @polyvar y[1:system_dimension]
@@ -69,9 +70,6 @@ function optimization(input_data::Tuple)
     barrier_degree::Int64 = barrier_degree_input
     alpha::Float64 = 1
     lagrange_degree::Int64 = 2
-
-    # Specify noise element (Gaussian)
-    standard_deviation::Float64 = 0.1^2
 
     # Specify initial state
     x_init::Array{Float64, 2} = zeros(1, system_dimension)
@@ -433,11 +431,11 @@ function optimization(input_data::Tuple)
         exp_evaluated::DynamicPolynomials.Polynomial{true, AffExpr} = _e_barrier
 
         for zz = 1:system_dimension
-            exp_evaluated = subs(exp_evaluated, x[zz] => y[zz] + z)
+            exp_evaluated = subs(exp_evaluated, x[zz] => y[zz] + z[zz])
         end
 
         # Extract noise term
-        exp_poly, noise = expectation_noise(exp_evaluated, barrier_degree::Int64, standard_deviation::Float64, z::PolyVar{true})
+        exp_poly, noise = expectation_noise(exp_evaluated, standard_deviation, z)
 
         # Full expectation term
         exp_current = exp_poly + noise
@@ -490,12 +488,12 @@ function optimization(input_data::Tuple)
         max_beta = maximum(beta_values)
 
         # Print probability values
-        println("Solution: [eta = $(value(eta)), beta = $(value(max_beta)), total = $(value(eta) + value(max_beta)) ]")
+        println("Solution: [eta = $(value(eta)), beta = $(value(max_beta)), total = $(value(eta) + value(max_beta)*time_horizon) ]")
   
     else
 
         # Print probability values
-        println("Solution: [eta = $(value(eta)), beta = $(value(beta)), total = $(value(eta) + value(beta)) ]")
+        println("Solution: [eta = $(value(eta)), beta = $(value(beta)), total = $(value(eta) + value(beta)*time_horizon) ]")
         
     end
 
@@ -506,7 +504,7 @@ function optimization(input_data::Tuple)
         end
 
         open("probabilities/probs_cert_"*system_flag*string(number_hypercubes)*".txt", "a") do io
-        println(io, "eta = $(value(eta)), beta = $(value(beta)), total = $(value(eta) + value(beta)) ")
+        println(io, "eta = $(value(eta)), beta = $(value(beta)), total = $(value(eta) + value(beta)*time_horizon) ")
         end
 
         # Print beta values to txt file
@@ -547,6 +545,7 @@ function control_loop(input_data::Tuple, certificate, eta_certificate, x_star, m
     layer_flag = input_data[7]
     beta_partition = input_data[8]
     print_to_txt = input_data[11]
+    standard_deviation = input_data[13]
 
     # File reading
     filename = "/models/" * system_flag * "/" * neural_network_bound  * "/" * layer_flag* "_layers/partition_data_"  * string(number_hypercubes) * ".mat"
@@ -581,7 +580,7 @@ function control_loop(input_data::Tuple, certificate, eta_certificate, x_star, m
     @polyvar x[1:system_dimension]
 
     # Create noise variable
-    @polyvar z
+    @polyvar z[1:system_dimension]
 
     # Create global CROWN bounds variables
     @polyvar y[1:system_dimension]
@@ -601,9 +600,6 @@ function control_loop(input_data::Tuple, certificate, eta_certificate, x_star, m
     # Create barrier polynomial, specify degree Lagrangian polynomials
     alpha::Float64 = 1
     lagrange_degree::Int64 = 2
-
-    # Specify noise element (Gaussian)
-    standard_deviation::Float64 = 0.1
 
     # Barrier
     BARRIER = certificate
@@ -743,12 +739,11 @@ function control_loop(input_data::Tuple, certificate, eta_certificate, x_star, m
         exp_evaluated::DynamicPolynomials.Polynomial{true, AffExpr} = _e_barrier
 
         for zz = 1:system_dimension
-            exp_evaluated = subs(exp_evaluated, x[zz] => y[zz] + z)
+            exp_evaluated = subs(exp_evaluated, x[zz] => y[zz] + z[zz])
         end
 
         # Extract noise term
-        barrier_degree = barrier_degree_input
-        exp_poly, noise = expectation_noise(exp_evaluated, barrier_degree::Int64, standard_deviation::Float64, z::PolyVar{true})
+        exp_poly, noise = expectation_noise(exp_evaluated, standard_deviation, z)
 
         # Full expectation term
         exp_current = exp_poly + noise
@@ -796,13 +791,13 @@ function control_loop(input_data::Tuple, certificate, eta_certificate, x_star, m
         max_beta = maximum(beta_values)
 
         # Print probability values
-        println("Solution: [eta = $(value(eta)), beta = $(value(max_beta)), total = $(value(eta) + value(max_beta)) ]")
+        println("Solution: [eta = $(value(eta)), beta = $(value(max_beta)), total = $(value(eta) + value(max_beta)*time_horizon) ]")
         # end
 
     else
 
         # Print probability values
-        println("Solution: [eta = $(value(eta)), beta = $(value(beta)), total = $(value(eta) + value(beta)) ]")
+        println("Solution: [eta = $(value(eta)), beta = $(value(beta)), total = $(value(eta) + value(beta)*time_horizon) ]")
         
     end
 
@@ -813,7 +808,7 @@ function control_loop(input_data::Tuple, certificate, eta_certificate, x_star, m
         end
 
         open("probabilities/probs_cont_"*system_flag*string(number_hypercubes)*".txt", "a") do io
-        println(io, "eta = $(value(eta)), beta = $(value(beta)), total = $(value(eta) + value(beta)) ")
+        println(io, "eta = $(value(eta)), beta = $(value(beta)), total = $(value(eta) + value(beta)*time_horizon) ")
         end
 
     end

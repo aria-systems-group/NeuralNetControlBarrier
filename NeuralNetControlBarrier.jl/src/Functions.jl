@@ -32,32 +32,41 @@ function add_constraint_to_model(model::Model, expression::DynamicPolynomials.Po
 end
 
 # Function to compute the expecation and noise element
-function expectation_noise(exp_evaluated::DynamicPolynomials.Polynomial{true, AffExpr}, barrier_degree::Int64, standard_deviation::Float64, z::PolyVar{true})
+function expectation_noise(exp_evaluated, standard_deviations, zs)
+    exp_poly = 0
+    noise = 0
 
-    exp_poly::DynamicPolynomials.Polynomial{true, AffExpr} = 0
-    noise::DynamicPolynomials.Polynomial{true, AffExpr} = 0
+    for term in terms(exp_evaluated)
+        z_degs = [MultivariatePolynomials.degree(term, z) for z in zs]
 
-    for zz in 1:length(exp_evaluated)
-        z_occurs = occursin('z', string(exp_evaluated[zz]))
+        z_occurs = sum(z_degs) > 0
 
         if z_occurs == false
-            exp_poly = exp_poly + exp_evaluated[zz]
+            exp_poly = exp_poly + term
         end
 
         if z_occurs == true
-            for z_deg = 2:2:barrier_degree
-                even_order_z = contains(string(exp_evaluated[zz]), "z^$z_deg")
-                if even_order_z == true
-                    exp_deep_evaluated::Term{true, AffExpr} = exp_evaluated[zz]
-                    z_coefficients::Term{true, AffExpr} = subs(exp_deep_evaluated, z => 1)
+            all_even = all(iseven, z_degs)
 
-                    noise_exp = z_coefficients * (doublefactorial(z_deg - 1) * standard_deviation^z_deg)
-                    noise = noise + noise_exp
-                end
+            if all_even
+                coeff = subs(term, zs => ones(length(zs)))
+                exp_z = prod([expected_univariate_noise(z_deg, standard_deviation) for (z_deg, standard_deviation) in zip(z_degs, standard_deviations)])
+
+                noise_exp = coeff * exp_z
+                noise = noise + noise_exp
             end
         end
     end
+
     return exp_poly, noise
+end
+
+function expected_univariate_noise(z_deg, standard_deviation)
+    if z_deg == 0
+        return 1
+    else
+        return (doublefactorial(z_deg - 1) * standard_deviation^z_deg)
+    end
 end
 
 # Compute the final barrier certificate
