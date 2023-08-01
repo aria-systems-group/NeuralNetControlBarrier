@@ -1,7 +1,7 @@
 # Functions call for Sum of Squares Optimization
 
 # Create Control Barrier Polynomial
-function barrier_polynomial(c::Vector{VariableRef}, barrier_monomial::MonomialVector{true})::DynamicPolynomials.Polynomial{true, AffExpr}
+function barrier_polynomial(c::Vector{VariableRef}, barrier_monomial)
     barrier_poly = 0
     for cc in 1:Integer(length(barrier_monomial))
         barrier_poly += c[cc] * barrier_monomial[cc]
@@ -10,8 +10,8 @@ function barrier_polynomial(c::Vector{VariableRef}, barrier_monomial::MonomialVe
 end
 
 # Create SOS polynomial function
-function sos_polynomial(k::Vector{VariableRef}, var, k_count::Int64, lagrange_degree::Int64)::DynamicPolynomials.Polynomial{true, AffExpr}
-    sos_polynomial::MonomialVector{true}  = monomials(var, 0:lagrange_degree)
+function sos_polynomial(k::Vector{VariableRef}, var, k_count::Int64, lagrange_degree::Int64)
+    sos_polynomial = monomials(var, 0:lagrange_degree)
     sos_poly_t = 0
     for sos in 1:Integer(length(sos_polynomial))
         sos_poly_t += k[sos + k_count*length(sos_polynomial)] * sos_polynomial[sos]
@@ -21,13 +21,13 @@ end
 
 # Function to compute number of decision variables per Lagrange function
 function length_polynomial(var, degree::Int64)::Int64
-    sos_polynomial::MonomialVector{true}  = monomials(var, 0:degree)
+    sos_polynomial = monomials(var, 0:degree)
     length_polynomial::Int64 = length(sos_polynomial)
     return length_polynomial
 end
 
 # Function to add constraints to the model
-function add_constraint_to_model(model::Model, expression::DynamicPolynomials.Polynomial{true, AffExpr})
+function add_constraint_to_model(model::Model, expression)
     @constraint(model, expression >= 0)
 end
 

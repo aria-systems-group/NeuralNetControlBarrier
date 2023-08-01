@@ -75,9 +75,9 @@ function optimization(input_data::Tuple)
     x_init::Array{Float64, 2} = zeros(1, system_dimension)
 
     # Create barrier candidate
-    barrier_monomial::MonomialVector{true} = monomials(x, 0:barrier_degree)
+    barrier_monomial = monomials(x, 0:barrier_degree)
     @JuMP.variable(model, c[1:Integer(length(barrier_monomial))])
-    BARRIER::DynamicPolynomials.Polynomial{true, AffExpr} = barrier_polynomial(c, barrier_monomial)
+    BARRIER= barrier_polynomial(c, barrier_monomial)
 
     # Add constraints to model for positive barrier, eta and beta
     add_constraint_to_model(model, BARRIER)
@@ -121,22 +121,22 @@ function optimization(input_data::Tuple)
             count_lag = 0
 
             # Optimize this code: not all x variables needed in lag_poly_i, lag_poly_theta (only 1 2 4 and 3, respectively)
-            lag_poly_i::DynamicPolynomials.Polynomial{true, AffExpr} =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, count_lag::Int64, lagrange_degree::Int64)
+            lag_poly_i =  sos_polynomial(l::Vector{VariableRef}, x, count_lag::Int64, lagrange_degree::Int64)
             add_constraint_to_model(model, lag_poly_i)
             
             # Change the radius ball of theta
             if system_flag == "cartpole" && large_range_initial == true 
-                lag_poly_theta::DynamicPolynomials.Polynomial{true, AffExpr} =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag+1)::Int64, lagrange_degree::Int64)
+                lag_poly_theta =  sos_polynomial(l::Vector{VariableRef}, x, (count_lag+1)::Int64, lagrange_degree::Int64)
                 add_constraint_to_model(model, lag_poly_theta)
             elseif (system_flag == "pendulum" && large_range_initial == true) || (system_flag == "pendulum3d" && large_range_initial == true )
-                lag_poly_theta_pen::DynamicPolynomials.Polynomial{true, AffExpr} =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag+1)::Int64, lagrange_degree::Int64)
+                lag_poly_theta_pen =  sos_polynomial(l::Vector{VariableRef}, x, (count_lag+1)::Int64, lagrange_degree::Int64)
                 add_constraint_to_model(model, lag_poly_theta_pen)
             elseif  (system_flag == "husky4d" || system_flag == "husky5d") && large_range_initial == true
-                lag_poly_x1 =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag+1)::Int64, lagrange_degree::Int64)
-                lag_poly_x2 =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag+2)::Int64, lagrange_degree::Int64)
+                lag_poly_x1 =  sos_polynomial(l::Vector{VariableRef}, x, (count_lag+1)::Int64, lagrange_degree::Int64)
+                lag_poly_x2 =  sos_polynomial(l::Vector{VariableRef}, x, (count_lag+2)::Int64, lagrange_degree::Int64)
             elseif  (system_flag == "acrobot") && large_range_initial == true
-                lag_poly_x1 =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag+1)::Int64, lagrange_degree::Int64)
-                lag_poly_x2 =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag+2)::Int64, lagrange_degree::Int64)
+                lag_poly_x1 =  sos_polynomial(l::Vector{VariableRef}, x, (count_lag+1)::Int64, lagrange_degree::Int64)
+                lag_poly_x2 =  sos_polynomial(l::Vector{VariableRef}, x, (count_lag+2)::Int64, lagrange_degree::Int64)
             end
 
             # Initial condition radius and ball
@@ -222,8 +222,8 @@ function optimization(input_data::Tuple)
 
                 # Generate sos polynomials
                 count_lag = 2*ii
-                lag_poly_i_lower =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag - 1)::Int64, lagrange_degree::Int64)
-                lag_poly_i_upper =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag)::Int64, lagrange_degree::Int64)
+                lag_poly_i_lower =  sos_polynomial(l::Vector{VariableRef}, x, (count_lag - 1)::Int64, lagrange_degree::Int64)
+                lag_poly_i_upper =  sos_polynomial(l::Vector{VariableRef}, x, (count_lag)::Int64, lagrange_degree::Int64)
 
                 # State space ranges
                 x_i_lower = state_space[ii, 1]
@@ -252,8 +252,8 @@ function optimization(input_data::Tuple)
                     count_lag = 2*ii
                 end
 
-                lag_poly_i_lower =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag - 1)::Int64, lagrange_degree::Int64)
-                lag_poly_i_upper =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag)::Int64, lagrange_degree::Int64)
+                lag_poly_i_lower =  sos_polynomial(l::Vector{VariableRef}, x, (count_lag - 1)::Int64, lagrange_degree::Int64)
+                lag_poly_i_upper =  sos_polynomial(l::Vector{VariableRef}, x, (count_lag)::Int64, lagrange_degree::Int64)
 
                 # State space ranges
                 x_i_lower = state_space[ii, 1]
@@ -283,8 +283,8 @@ function optimization(input_data::Tuple)
                     count_lag = 2*ii
                 end
 
-                lag_poly_i_lower =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag - 1)::Int64, lagrange_degree::Int64)
-                lag_poly_i_upper =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag)::Int64, lagrange_degree::Int64)
+                lag_poly_i_lower =  sos_polynomial(l::Vector{VariableRef}, x, (count_lag - 1)::Int64, lagrange_degree::Int64)
+                lag_poly_i_upper =  sos_polynomial(l::Vector{VariableRef}, x, (count_lag)::Int64, lagrange_degree::Int64)
 
                 # State space ranges
                 x_i_lower = -0.6
@@ -309,8 +309,8 @@ function optimization(input_data::Tuple)
 
                 # Generate sos polynomials
                     count_lag = 2*ii
-                    lag_poly_i_lower =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag - 1)::Int64, lagrange_degree::Int64)
-                    lag_poly_i_upper =  sos_polynomial(l::Vector{VariableRef}, x::Array{PolyVar{true},1}, (count_lag)::Int64, lagrange_degree::Int64)
+                    lag_poly_i_lower =  sos_polynomial(l::Vector{VariableRef}, x, (count_lag - 1)::Int64, lagrange_degree::Int64)
+                    lag_poly_i_upper =  sos_polynomial(l::Vector{VariableRef}, x, (count_lag)::Int64, lagrange_degree::Int64)
         
                     # State space ranges
                     x_i_lower = state_space[ii, 1]
@@ -335,7 +335,7 @@ function optimization(input_data::Tuple)
     end
 
     # Variables g and h for Lagrange multipliers
-    lagrange_monomial_length::Int64 = length_polynomial(x::Array{PolyVar{true},1}, lagrange_degree::Int64)
+    lagrange_monomial_length::Int64 = length_polynomial(x, lagrange_degree::Int64)
     number_of_variables_exp::Int64 = number_hypercubes_constraints * (system_dimension) * lagrange_monomial_length
     @JuMP.variable(model, g[1:number_of_variables_exp])
     @JuMP.variable(model, h[1:number_of_variables_exp])
@@ -373,8 +373,8 @@ function optimization(input_data::Tuple)
         end
 
         # Create SOS polynomials for X (Partition) and Y (Bounds)
-        hCubeSOS_X::DynamicPolynomials.Polynomial{true, AffExpr} = 0
-        hCubeSOS_Y::DynamicPolynomials.Polynomial{true, AffExpr} = 0
+        hCubeSOS_X = 0
+        hCubeSOS_Y = 0
         
         # Define global or explicit upper and lower bound for kth dimension of partition parts
         M_h_ii = transpose(M_h[identifier, :, :])
@@ -400,16 +400,16 @@ function optimization(input_data::Tuple)
             y_k_lower_explicit = hyper_matrix_lower[kk]
           
             # Generate Lagrange polynomial for kth dimension
-            lag_poly_X::DynamicPolynomials.Polynomial{true, AffExpr} = sos_polynomial(g::Vector{VariableRef}, x::Array{PolyVar{true},1}, (counter_lag + kk - 1)::Int64, lagrange_degree::Int64)
-            lag_poly_Y::DynamicPolynomials.Polynomial{true, AffExpr} = sos_polynomial(h::Vector{VariableRef}, y::Array{PolyVar{true},1}, (counter_lag + kk - 1)::Int64, lagrange_degree::Int64)
+            lag_poly_X = sos_polynomial(g::Vector{VariableRef}, x, (counter_lag + kk - 1)::Int64, lagrange_degree::Int64)
+            lag_poly_Y = sos_polynomial(h::Vector{VariableRef}, y, (counter_lag + kk - 1)::Int64, lagrange_degree::Int64)
 
             # Add Lagrange polynomial to constraints vector for the state space
             constraints[parts_count, kk] = lag_poly_X
             constraints[parts_count, kk + system_dimension] = lag_poly_Y
 
             # Generate SOS polynomials for state space
-            hCubeSOS_X::DynamicPolynomials.Polynomial{true, AffExpr} += lag_poly_X*(x_k_upper - x[kk])*(x[kk] - x_k_lower)
-            hCubeSOS_Y::DynamicPolynomials.Polynomial{true, AffExpr} += lag_poly_Y*(y_k_upper_explicit - y[kk])*(y[kk] - y_k_lower_explicit)
+            hCubeSOS_X += lag_poly_X*(x_k_upper - x[kk])*(x[kk] - x_k_lower)
+            hCubeSOS_Y += lag_poly_Y*(y_k_upper_explicit - y[kk])*(y[kk] - y_k_lower_explicit)
         end
 
         # Update system counter
@@ -418,7 +418,7 @@ function optimization(input_data::Tuple)
         # SOS for beta partition
         if beta_partition == true
     
-            lag_poly_beta::DynamicPolynomials.Polynomial{true, AffExpr} = sos_polynomial(delta::Vector{VariableRef}, w::Array{PolyVar{true},1}, (counter_beta)::Int64, lagrange_degree::Int64)
+            lag_poly_beta = sos_polynomial(delta::Vector{VariableRef}, w, (counter_beta)::Int64, lagrange_degree::Int64)
 
             constraints[parts_count, (2*system_dimension) + 1] = lag_poly_beta
 
@@ -427,8 +427,8 @@ function optimization(input_data::Tuple)
         end
 
         # Compute expectation
-        _e_barrier::DynamicPolynomials.Polynomial{true, AffExpr} = BARRIER
-        exp_evaluated::DynamicPolynomials.Polynomial{true, AffExpr} = _e_barrier
+        _e_barrier = BARRIER
+        exp_evaluated = _e_barrier
 
         for zz = 1:system_dimension
             exp_evaluated = subs(exp_evaluated, x[zz] => y[zz] + z[zz])
@@ -615,7 +615,7 @@ function control_loop(input_data::Tuple, certificate, eta_certificate, x_star, m
     end
 
     # Variables g and h for Lagrange multipliers
-    lagrange_monomial_length::Int64 = length_polynomial(x::Array{PolyVar{true},1}, lagrange_degree::Int64)
+    lagrange_monomial_length::Int64 = length_polynomial(x, lagrange_degree::Int64)
     number_of_variables_exp::Int64 = number_hypercubes_constraints * (system_dimension) * lagrange_monomial_length
     @JuMP.variable(model, g[1:number_of_variables_exp])
     @JuMP.variable(model, h[1:number_of_variables_exp])
@@ -655,8 +655,8 @@ function control_loop(input_data::Tuple, certificate, eta_certificate, x_star, m
         end
 
         # Create SOS polynomials for X (Partition) and Y (Bounds)
-        hCubeSOS_X::DynamicPolynomials.Polynomial{true, AffExpr} = 0
-        hCubeSOS_Y::DynamicPolynomials.Polynomial{true, AffExpr} = 0
+        hCubeSOS_X = 0
+        hCubeSOS_Y = 0
         
         # Define global or explicit upper and lower bound for kth dimension of partition parts
         M_h_ii = transpose(M_h[identifier, :, :])
@@ -707,16 +707,16 @@ function control_loop(input_data::Tuple, certificate, eta_certificate, x_star, m
             end
           
             # Generate Lagrange polynomial for kth dimension
-            lag_poly_X::DynamicPolynomials.Polynomial{true, AffExpr} = sos_polynomial(g::Vector{VariableRef}, x::Array{PolyVar{true},1}, (counter_lag + kk - 1)::Int64, lagrange_degree::Int64)
-            lag_poly_Y::DynamicPolynomials.Polynomial{true, AffExpr} = sos_polynomial(h::Vector{VariableRef}, y::Array{PolyVar{true},1}, (counter_lag + kk - 1)::Int64, lagrange_degree::Int64)
+            lag_poly_X = sos_polynomial(g::Vector{VariableRef}, x, (counter_lag + kk - 1)::Int64, lagrange_degree::Int64)
+            lag_poly_Y = sos_polynomial(h::Vector{VariableRef}, y, (counter_lag + kk - 1)::Int64, lagrange_degree::Int64)
 
             # Add Lagrange polynomial to constraints vector for the state space
             constraints[parts_count, kk] = lag_poly_X
             constraints[parts_count, kk + system_dimension] = lag_poly_Y
 
             # Generate SOS polynomials for state space
-            hCubeSOS_X::DynamicPolynomials.Polynomial{true, AffExpr} += lag_poly_X*(x_k_upper - x[kk])*(x[kk] - x_k_lower)
-            hCubeSOS_Y::DynamicPolynomials.Polynomial{true, AffExpr} += lag_poly_Y*(y_k_upper_explicit - y[kk])*(y[kk] - y_k_lower_explicit)
+            hCubeSOS_X += lag_poly_X*(x_k_upper - x[kk])*(x[kk] - x_k_lower)
+            hCubeSOS_Y += lag_poly_Y*(y_k_upper_explicit - y[kk])*(y[kk] - y_k_lower_explicit)
 
         end
 
@@ -726,7 +726,7 @@ function control_loop(input_data::Tuple, certificate, eta_certificate, x_star, m
         # SOS for beta partition
         if beta_partition == true
     
-            lag_poly_beta::DynamicPolynomials.Polynomial{true, AffExpr} = sos_polynomial(delta::Vector{VariableRef}, w::Array{PolyVar{true},1}, (counter_beta)::Int64, lagrange_degree::Int64)
+            lag_poly_beta = sos_polynomial(delta::Vector{VariableRef}, w, (counter_beta)::Int64, lagrange_degree::Int64)
 
             constraints[parts_count, (2*system_dimension) + 1] = lag_poly_beta
 
@@ -735,8 +735,8 @@ function control_loop(input_data::Tuple, certificate, eta_certificate, x_star, m
         end
 
         # Compute expectation
-        _e_barrier::DynamicPolynomials.Polynomial{true, AffExpr} = BARRIER
-        exp_evaluated::DynamicPolynomials.Polynomial{true, AffExpr} = _e_barrier
+        _e_barrier = BARRIER
+        exp_evaluated = _e_barrier
 
         for zz = 1:system_dimension
             exp_evaluated = subs(exp_evaluated, x[zz] => y[zz] + z[zz])
