@@ -10,7 +10,7 @@ function barrier_polynomial(c::Vector{VariableRef}, barrier_monomial::MonomialVe
 end
 
 # Create SOS polynomial function
-function sos_polynomial(k::Vector{VariableRef}, var::Array{PolyVar{true},1}, k_count::Int64, lagrange_degree::Int64)::DynamicPolynomials.Polynomial{true, AffExpr}
+function sos_polynomial(k::Vector{VariableRef}, var, k_count::Int64, lagrange_degree::Int64)::DynamicPolynomials.Polynomial{true, AffExpr}
     sos_polynomial::MonomialVector{true}  = monomials(var, 0:lagrange_degree)
     sos_poly_t = 0
     for sos in 1:Integer(length(sos_polynomial))
@@ -20,7 +20,7 @@ function sos_polynomial(k::Vector{VariableRef}, var::Array{PolyVar{true},1}, k_c
 end
 
 # Function to compute number of decision variables per Lagrange function
-function length_polynomial(var::Array{PolyVar{true},1}, degree::Int64)::Int64
+function length_polynomial(var, degree::Int64)::Int64
     sos_polynomial::MonomialVector{true}  = monomials(var, 0:degree)
     length_polynomial::Int64 = length(sos_polynomial)
     return length_polynomial

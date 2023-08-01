@@ -58,12 +58,12 @@ function optimization(input_data::Tuple)
     @polyvar w[1:2]
 
     # Create probability decision variables eta  and beta
-    @variable(model, eta)
+    @JuMP.variable(model, eta)
     if beta_partition == true
-        @variable(model, beta_parts_var[1:number_hypercubes_constraints])
-        @variable(model, beta)
+        @JuMP.variable(model, beta_parts_var[1:number_hypercubes_constraints])
+        @JuMP.variable(model, beta)
     else
-        @variable(model, beta)
+        @JuMP.variable(model, beta)
     end
 
     # Create barrier polynomial, specify degree Lagrangian polynomials
@@ -76,7 +76,7 @@ function optimization(input_data::Tuple)
 
     # Create barrier candidate
     barrier_monomial::MonomialVector{true} = monomials(x, 0:barrier_degree)
-    @variable(model, c[1:Integer(length(barrier_monomial))])
+    @JuMP.variable(model, c[1:Integer(length(barrier_monomial))])
     BARRIER::DynamicPolynomials.Polynomial{true, AffExpr} = barrier_polynomial(c, barrier_monomial)
 
     # Add constraints to model for positive barrier, eta and beta
@@ -108,7 +108,7 @@ function optimization(input_data::Tuple)
     elseif system_flag == "pendulum" && large_range_initial == true 
         number_decision_vars = ((system_dimension)^2 + 1 + 1)*length(barrier_monomial)
     end
-    @variable(model, l[1:number_decision_vars])
+    @JuMP.variable(model, l[1:number_decision_vars])
 
     barrier_constraints_unsafe_initial = system_dimension + 1
 
@@ -337,15 +337,15 @@ function optimization(input_data::Tuple)
     # Variables g and h for Lagrange multipliers
     lagrange_monomial_length::Int64 = length_polynomial(x::Array{PolyVar{true},1}, lagrange_degree::Int64)
     number_of_variables_exp::Int64 = number_hypercubes_constraints * (system_dimension) * lagrange_monomial_length
-    @variable(model, g[1:number_of_variables_exp])
-    @variable(model, h[1:number_of_variables_exp])
+    @JuMP.variable(model, g[1:number_of_variables_exp])
+    @JuMP.variable(model, h[1:number_of_variables_exp])
 
     # Partition beta to extract ith beta values
     if beta_partition == true
 
         # Variables for beta in SOS
         num_vars_beta_lagrangian = number_hypercubes_constraints * lagrange_monomial_length
-        @variable(model, delta[1:num_vars_beta_lagrangian])
+        @JuMP.variable(model, delta[1:num_vars_beta_lagrangian])
 
         # Number of constraints
         number_constraints_per_loop = (2*system_dimension) + 1 + 1 + 1
@@ -363,7 +363,7 @@ function optimization(input_data::Tuple)
     parts_count::Int64 = 0
     counter_beta::Int64 = 0
 
-    for parts = 1:length(hcube_identifier)
+    for parts in eachindex(hcube_identifier)
 
         if hcube_identifier[parts] == 0.0
             continue
@@ -591,10 +591,10 @@ function control_loop(input_data::Tuple, certificate, eta_certificate, x_star, m
     # Create probability decision variables eta  and beta
     eta = eta_certificate
     if beta_partition == true
-        @variable(model, beta_parts_var[1:number_hypercubes_constraints])
-        @variable(model, beta)
+        @JuMP.variable(model, beta_parts_var[1:number_hypercubes_constraints])
+        @JuMP.variable(model, beta)
     else
-        @variable(model, beta)
+        @JuMP.variable(model, beta)
     end
 
     # Create barrier polynomial, specify degree Lagrangian polynomials
@@ -617,15 +617,15 @@ function control_loop(input_data::Tuple, certificate, eta_certificate, x_star, m
     # Variables g and h for Lagrange multipliers
     lagrange_monomial_length::Int64 = length_polynomial(x::Array{PolyVar{true},1}, lagrange_degree::Int64)
     number_of_variables_exp::Int64 = number_hypercubes_constraints * (system_dimension) * lagrange_monomial_length
-    @variable(model, g[1:number_of_variables_exp])
-    @variable(model, h[1:number_of_variables_exp])
+    @JuMP.variable(model, g[1:number_of_variables_exp])
+    @JuMP.variable(model, h[1:number_of_variables_exp])
 
     # Partition beta to extract ith beta values
     if beta_partition == true
 
         # Variables for beta in SOS
         num_vars_beta_lagrangian = number_hypercubes_constraints * lagrange_monomial_length
-        @variable(model, delta[1:num_vars_beta_lagrangian])
+        @JuMP.variable(model, delta[1:num_vars_beta_lagrangian])
 
         # Number of constraints
         number_constraints_per_loop = (2*system_dimension) + 1 + 1 + 1
@@ -645,7 +645,7 @@ function control_loop(input_data::Tuple, certificate, eta_certificate, x_star, m
     count_bad::Int64 = 0
     feedback_control_store = zeros(system_dimension, number_hypercubes)
 
-    for parts = 1:length(hcube_identifier)
+    for parts in eachindex(hcube_identifier)
 
         if hcube_identifier[parts] == 0.0
             continue

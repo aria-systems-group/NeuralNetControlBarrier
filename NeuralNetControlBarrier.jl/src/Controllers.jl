@@ -6,12 +6,12 @@ function controller_convex(system_flag, x_star, system_dimension, identifier, co
     set_optimizer(lp_control_model, GLPK.Optimizer)
 
     # Create feedback law
-    @variable(lp_control_model, theta[1:system_dimension])
-    @variable(lp_control_model, x[1:system_dimension])
-    @variable(lp_control_model, x_prime[1:system_dimension])
-    @variable(lp_control_model, y[1:system_dimension])
-    @variable(lp_control_model, y_prime[1:system_dimension])
-    @variable(lp_control_model, u[1:system_dimension])
+    @JuMP.variable(lp_control_model, theta[1:system_dimension])
+    @JuMP.variable(lp_control_model, x[1:system_dimension])
+    @JuMP.variable(lp_control_model, x_prime[1:system_dimension])
+    @JuMP.variable(lp_control_model, y[1:system_dimension])
+    @JuMP.variable(lp_control_model, y_prime[1:system_dimension])
+    @JuMP.variable(lp_control_model, u[1:system_dimension])
 
     # Argmin of barrier 
     # x_star = zeros(1, system_dimension)
