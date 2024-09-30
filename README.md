@@ -80,9 +80,12 @@ All contributions welcome! All content in this repository is licensed under the 
 If the package NeuralNetControlBarrier.jl is useful in your research, and you would like to acknowledge it, please cite this [paper](https://arxiv.org/abs/2206.07811):
 
 ```
-@article{mazouz2022nncbf,
-  author  = {Rayan Mazouz, Karan Muvvala, Akash Ratheesh, Luca Laurenti and Morteza Lahijanian},
-  title   = {Safety Guarantees for Neural Network Dynamic Systems via Stochastic Barrier Functions},
-  year    = {2022},
-  url     = {https://arxiv.org/abs/2206.07811}
+@article{mazouz2022safety,
+  title={Safety guarantees for neural network dynamic systems via stochastic barrier functions},
+  author={Mazouz, Rayan and Muvvala, Karan and Ratheesh Babu, Akash and Laurenti, Luca and Lahijanian, Morteza},
+  journal={Advances in Neural Information Processing Systems},
+  volume={35},
+  pages={9672--9686},
+  year={2022}
 }
+
